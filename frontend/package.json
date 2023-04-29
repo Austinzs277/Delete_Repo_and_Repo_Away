@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.12.4",
     "firebase": "^9.20.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-error-overlay": "^6.0.9",
     "react-firebaseui": "^6.0.0",
+    "react-router-dom": "^6.11.0",
     "react-scripts": "^4.0.3",
     "web-vitals": "^2.1.4"
   },
