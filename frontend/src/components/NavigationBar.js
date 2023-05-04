@@ -24,6 +24,9 @@ const NavBar = (props) => {
     const handleLoginClick = () => {
         navigate('/login');
     }
+    const handleProfileClick = () => {
+        navigate('/profile')
+    }
 
     return (
         <AppBar position="static">
@@ -33,9 +36,20 @@ const NavBar = (props) => {
                 <Typography variant="h6" className={classes.title}>
                 CalCalories
                 </Typography>
-                <Button color="inherit" onClick={handleLoginClick}>
-                    {user ? 'Logout' : 'Login'}
-                </Button>
+                {user ? (
+                    <div>
+                    <Button color="inherit" onClick={handleProfileClick}>
+                        Profile
+                    </Button>
+                    <Button color="inherit" onClick={handleLoginClick}>
+                        Logout
+                    </Button>
+                    </div>
+                ) : (
+                    <Button color="inherit" onClick={handleLoginClick}>
+                    Login
+                    </Button>
+                )}
             </Toolbar>
         </AppBar>
     );
