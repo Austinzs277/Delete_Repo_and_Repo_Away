@@ -31,9 +31,18 @@ const uiConfig = {
   signInOptions: [
     firebase.auth.EmailAuthProvider.PROVIDER_ID
   ],
+  // to execute the callbacks
+  signInSuccessUrl: undefined, 
   callbacks: {
     // Avoid redirects after sign-in.
-    signInSuccessWithAuthResult: () => false,
+    signInSuccessWithAuthResult: (authResult) => {
+      const userEmail = authResult.user.email; // get user's login email
+      const expirationDate = new Date(Date.now() + 86400000); // 24 hours from now
+      document.cookie = `user_email=${userEmail}; expires=${expirationDate.toUTCString()}`;
+
+      // prevent redirection
+      return false
+    },
   },
 };
 
@@ -46,6 +55,10 @@ function LoginPage() {
   const handleClick = () => {
     firebase.auth().signOut().then(() => {
       setIsSignedIn(false);
+      // delete the cookie by setting it expired
+      document.cookie = 'user_email=; expires=Thu, 01 Jan 1970 00:00:00 UTC;';
+      // Navigate to the dashboard page without user info after logged out
+      navigate('/');
     }).catch((error) => {
       console.log(error);
     });
