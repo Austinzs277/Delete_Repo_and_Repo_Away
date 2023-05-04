@@ -1,15 +1,32 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import morgan from 'morgan';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import cookieSession from 'cookie-session';
+import bodyParser from 'body-parser';
+import * as db from './database.js';
 
 const app = express();
+app.use(bodyParser.json());
 
-// Enable CORS
-app.use(cors());
+app.post('/foods', async (req, res) => {
+  console.log('in app post foods');
+  console.log(req.body);
+  const { name, caloriesPerServing, servings } = req.body;
+  console.log(name, caloriesPerServing, servings);
+  const newFood = db.addFoodIntake('Bao', name, servings, caloriesPerServing);
 
-// this is for test 
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Hello from the backend!' });
+  res.status(200).send(newFood);
 });
-// above is for test 
 
-module.exports = app;
+app.post('/deleteFoods', async (req, res) => {
+  console.log('in app post foods');
+  console.log(req.body);
+  const { name, caloriesPerServing, servings } = req.body;
+  console.log(name, caloriesPerServing, servings);
+  const newFood = db.deleteFoodIntake('Bao', name);
+
+  res.status(200).send(newFood);
+});
+
+export default app;
