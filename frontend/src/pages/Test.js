@@ -22,6 +22,7 @@ const TestPage = () => {
   const handleServingsChange = (event) => {
     setServing(event.target.value);
   };
+
   const handleSearch = async (event) => {
     event.preventDefault();
     const apiKey = '8a3db390b40b467e88258d6974076992';
@@ -46,7 +47,7 @@ const TestPage = () => {
   };
 
   const handleSave = async () => {
-    const response = await fetch('/foods', {
+    const response = await fetch('/addFoods', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

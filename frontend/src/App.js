@@ -4,14 +4,16 @@ import LoginPage from './pages/Login';
 import HomePage from './pages/Home';
 import ProfilePage from './pages/Profile';
 import TestPage from './pages/Test';
+import ReviewPage from './pages/Review';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<TestPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/review" element={<ReviewPage />} />
         {/* add other routes */}
       </Routes>
     </BrowserRouter>

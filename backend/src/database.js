@@ -1,8 +1,15 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { doc, setDoc, collection, addDoc, deleteDoc } from 'firebase/firestore';
+import {
+  doc,
+  setDoc,
+  collection,
+  addDoc,
+  deleteDoc,
+  getFirestore,
+  getDocs,
+} from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -99,6 +106,31 @@ export const deleteFoodIntake = async (userId, foodName) => {
     console.log('Document deleted successfully');
   } catch (error) {
     console.error('Error deleting document: ', error);
+    throw error;
+  }
+};
+
+export const addReview = async (reviews) => {
+  try {
+    await addDoc(collection(db, 'reviews'), {
+      content: reviews,
+    });
+    console.log('Review added successfully');
+  } catch (error) {
+    console.error('Error adding review: ', error);
+    throw error;
+  }
+};
+
+export const getReview = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'reviews'));
+    const res = querySnapshot.docs.map((doc) => doc.data());
+
+    console.log('Review get successfully', res);
+    return res;
+  } catch (error) {
+    console.error('Error getting review: ', error);
     throw error;
   }
 };
