@@ -47,7 +47,7 @@ export const searchFood = async (foodName) => {
     // console.log('database.js -> calories data', nutritionData.calories);
 
     return {
-      name: foodName,
+      name: searchData.results[0].title,
       image: searchData.results[0].image,
       imageType: searchData.results[0].imageType,
       calories: nutritionData.calories

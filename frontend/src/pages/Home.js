@@ -1,106 +1,109 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@material-ui/core/styles';
 import NavBar from '../components/NavigationBar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import ButtonBase from '@material-ui/core/ButtonBase';
 import { getCookie } from '../components/GetCookie';
 import 'firebase/compat/auth';
 
 /** Style */
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '50vh',
-    '& > *': {
-      margin: theme.spacing(1),
-      width: '25ch',
-    },
-  },
-}));
+const useStyles = makeStyles((theme) => 
+    createStyles({
+        root: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '50vh',
+            '& > *': {
+            margin: theme.spacing(1),
+            width: '25ch',
+            },
+        },
+        paper: {
+            padding: theme.spacing(2),
+            margin: 'auto',
+            maxWidth: 500,
+          },
+          image: {
+            width: 128,
+            height: 128,
+          },
+          img: {
+            margin: 'auto',
+            display: 'block',
+            maxWidth: '100%',
+            maxHeight: '100%',
+          },
+    })
+);
 
 function HomePage() {
-  const classes = useStyles();
+    const classes = useStyles();
   /*
     // get user's log in status
     const location = useLocation();
     console.log(location);
     */
 
-  // initialize the user's status as not logged in
-  const [user, setUser] = useState(false);
-  const [foodName, setFoodName] = useState('');
-  const [foodData, setFoodData] = useState(null);
-  const [serving, setServing] = useState(1);
-  const [savedFoods, setSavedFoods] = useState([]);
-  // access the cookie to check login info
-  const user_email = getCookie('user_email');
+    // initialize the user's status as not logged in
+    const [user, setUser] = useState(false);
+    // access the cookie to check login info
+    const user_email = getCookie('user_email');
+    useEffect(() => {
+        if (user_email) {
+            setUser(true);
+        }
+    }, []);
 
-  useEffect(() => {
-    if (user_email) {
-      setUser(true);
-    }
-  }, []);
+    /** TODO: Clean there variables */
+    const [foodName, setFoodName] = useState('');
+    const [foodData, setFoodData] = useState(null);
+    const [savedFoods, setSavedFoods] = useState([]);
 
-  const handleSearch = async (event) => {
-    event.preventDefault();
-    /** TODO: implement the GET API to search for food */
-    
-    const apiKey = '8a3db390b40b467e88258d6974076992';
-    const complexSearchUrl = `https://api.spoonacular.com/recipes/complexSearch?query=${foodName}&apiKey=${apiKey}`;
-    const complexSearchResponse = await fetch(complexSearchUrl);
-    const complexSearchData = await complexSearchResponse.json();
-    console.log(complexSearchData);
-    const foodId = complexSearchData.results[0].id;
-    const nutritionWidgetUrl = `https://api.spoonacular.com/recipes/${foodId}/nutritionWidget.json?apiKey=${apiKey}`;
-    const nutritionWidgetResponse = await fetch(nutritionWidgetUrl);
+    // Handle the search button
+    const handleSearch = async (event) => {
+        event.preventDefault();
+        /** TODO: There is a delay between click and api call*/ 
+        console.log(foodName);
+        const foodInput = {
+        "foodName": foodName
+        }
+        fetch("/searchFood", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(foodInput),
+            })
+            .then(response =>{
+                if (response.ok) {
+                return response.json();
+                } else{
+                /** TODO: Implement the 404 and catch the error  */
+                throw new Error("Reponse is not OK");
+                }
+        })
+        .then(data => {
+            console.log(data);
+            const foodTitle = data.name;
+            const foodUrl = data.image;
+            const foodCal = data.calories;
+            setFoodData({
+                name: foodTitle,
+                caloriesPerServing: foodCal,
+                url: foodUrl
+            });
+        })
+        .catch(error => {
+            console.log(error)
+        });
+    };
 
-    const nutritionWidgetData = nutritionWidgetResponse.json();
-    console.log('nutritionWidgetData', nutritionWidgetData);
-    const foodNutrition = nutritionWidgetData.calories;
-    console.log('nutrition', foodNutrition);
-    setFoodData({
-      name: foodName,
-      caloriesPerServing: foodNutrition,
-      servingsPerContainer: serving,
-    });
-  };
-
-  const handleDelete = async () => {
-    const response = await fetch('/deleteFood', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: foodName,
-      }),
-    });
-
-    const data = await response.json();
-    setSavedFoods([...savedFoods, data]);
-    console.log(data);
-  };
-
-  const handleSave = async () => {
-    const response = await fetch('/addFood', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: foodName,
-        caloriesPerServing: foodData.caloriesPerServing,
-        servings: serving,
-      }),
-    });
-
-    const data = await response.json();
-    setSavedFoods([...savedFoods, data]);
-    console.log(data);
-  };
   // TODO: Delete after debugging
   /*
     const [message, setMessage] = useState('');
@@ -134,18 +137,36 @@ function HomePage() {
       </form>
 
       {foodData && (
-        <div>
-          <div className="food-card">
-            <h2>{foodData.name}</h2>
-            <div className="food-card-row">
-              <p>Calories per serving:</p>
-              <p>{foodData.caloriesPerServing}</p>
-            </div>
-            <button onClick={handleSave}>Save food</button>
-            <button onClick={handleDelete}>Delete food</button>
-          </div>
-        </div>
-      )}
+            <Paper className={classes.paper}>
+                <Grid container spacing={2}>
+                    <Grid item>
+                        <ButtonBase className={classes.image}>
+                        <img className={classes.img} alt="complex" src={foodData.url} />
+                        </ButtonBase>
+                    </Grid>
+                    <Grid item xs={12} sm container>
+                        <Grid item xs container direction="column" spacing={2}>
+                        <Grid item xs>
+                            <Typography gutterBottom variant="subtitle1">
+                            {foodData.name}
+                            </Typography>
+                            <Typography variant="body2" gutterBottom>
+                            Calories per serving:
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                            {foodData.caloriesPerServing}
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <Button variant="outlined" color="primary">
+                            Save Food
+                            </Button>
+                        </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Paper>
+        )}
     </div>
   );
 }
