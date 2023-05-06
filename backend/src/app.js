@@ -9,7 +9,7 @@ import * as db from './database.js';
 const app = express();
 app.use(bodyParser.json());
 
-app.post('/addFoods', async (req, res) => {
+app.post('/addFood', async (req, res) => {
   const { name, caloriesPerServing, servings } = req.body;
   console.log(name, caloriesPerServing, servings);
   const newFood = db.addFoodIntake('Bao', name, servings, caloriesPerServing);
@@ -17,14 +17,15 @@ app.post('/addFoods', async (req, res) => {
   res.status(200).send(newFood);
 });
 
-app.post('/deleteFoods', async (req, res) => {
+app.post('/deleteFood', async (req, res) => {
   const { name, caloriesPerServing, servings } = req.body;
   console.log(name, caloriesPerServing, servings);
   const newFood = db.deleteFoodIntake('Bao', name);
-
+  
   res.status(200).send(newFood);
 });
 
+// reviews
 app.post('/reviews', async (req, res) => {
   const { reviews } = req.body;
   console.log('in reviews', reviews);

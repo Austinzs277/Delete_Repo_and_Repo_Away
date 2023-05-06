@@ -47,7 +47,7 @@ const TestPage = () => {
   };
 
   const handleSave = async () => {
-    const response = await fetch('/addFoods', {
+    const response = await fetch('/addFood', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ const TestPage = () => {
   };
 
   const handleDelete = async () => {
-    const response = await fetch('/deleteFoods', {
+    const response = await fetch('/deleteFood', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

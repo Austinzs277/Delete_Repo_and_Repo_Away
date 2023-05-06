@@ -15,53 +15,24 @@ npm start
 
 ### Data Model
 
-- user
-    - foodlist
-        - foodId
-            - name
-            - number
-            - cal
-    - totalCal
+table 1:
+- users
+    - user
+        - foodIntake
+            - {food}
+                - calorieData
+                - foodName
+                - servingSize
+                - totalCalories
 
-Example:
+table 2:
 
-{
-
-    user_id1: {
-
-        food: {
-
-            23423409: {
-
-                name: sweet apple
-
-                number: 5,
-
-                cal: 100
-
-            },
-
-            34524290: {
-
-                name: pear
-
-                number: 4,
-
-                cal: 80
-
-            }
-
-        }, 
-
-        total: 820
-
-    }
-
-}
-
+- reviews
+    - reivew
 
 ### API
-1. GET api/test: test whether we can get information from frontend
+
+1. login/logout: firebase auth
 
 2. POST api/searchFood: call the third party api to get cal for food
 
@@ -69,28 +40,32 @@ Example:
 
     output: res.foodName, res.calories, res.url
 
-3. POST api/createFood: create or add food
+2. POST api/addFood: Add food
+
     input: req.foodId
 
     output: 201/400
 
-4. GET api/selectAllFood: get all food for the user
+3. GET api/selectAllFood: get all food for the user
 
     output: res.all
 
-5. PUT api/deleteFood
+4. PUT api/deleteFood
 
     input: req.foodId
 
     output: 201/400
 
-6. PUT api/updateFood
+5. PUT api/updateFood
 
     input: req.newNumber
 
     output: req.number, req.cal, req.totalCal
 
-7. login/logout: firebase auth
+6. GET api/reviews
+
+7. POST api/reviews 
+
 
 ### Third Party API
 https://trackapi.nutritionix.com/v2/search/instant?query={{food name}}

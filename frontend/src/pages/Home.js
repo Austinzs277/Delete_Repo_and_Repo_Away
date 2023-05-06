@@ -47,7 +47,7 @@ function HomePage() {
   const handleSearch = async (event) => {
     event.preventDefault();
     /** TODO: implement the GET API to search for food */
-
+    
     const apiKey = '8a3db390b40b467e88258d6974076992';
     const complexSearchUrl = `https://api.spoonacular.com/recipes/complexSearch?query=${foodName}&apiKey=${apiKey}`;
     const complexSearchResponse = await fetch(complexSearchUrl);
@@ -69,7 +69,7 @@ function HomePage() {
   };
 
   const handleDelete = async () => {
-    const response = await fetch('/deleteFoods', {
+    const response = await fetch('/deleteFood', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ function HomePage() {
   };
 
   const handleSave = async () => {
-    const response = await fetch('/addFoods', {
+    const response = await fetch('/addFood', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
