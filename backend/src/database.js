@@ -1,5 +1,6 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import fetch from "node-fetch";
 import { initializeApp } from 'firebase/app';
 import {
   doc,
@@ -8,7 +9,7 @@ import {
   addDoc,
   deleteDoc,
   getFirestore,
-  getDocs,
+  getDocs
 } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -31,66 +32,103 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-export const addFoodIntake = async (
-  userId,
-  foodName,
-  servingSize,
-  calorieData
-) => {
-  const foodIntakeRef = collection(db, 'users', userId, foodName);
-  const newFoodIntake = {
-    foodName: foodName,
-    servingSize: servingSize,
-    calorieData: calorieData,
-    totalCalories: servingSize * calorieData, // calculate total calories
-  };
-  const docRef = doc(db, `users/${userId}/foodIntake/${foodName}`);
+// THIRD-PARTY APU -> search food from api 
+export const searchFood = async (foodName) => {
   try {
-    //const docRef = await addDoc(foodIntakeRef, newFoodIntake);
-    // const docRef = await addDoc(
-    //   doc(db, 'users', userId, 'foodName', foodName),
-    //   newFoodIntake
-    // );
+    const apiKey = '8a3db390b40b467e88258d6974076992';
+    const searchUrl = `https://api.spoonacular.com/recipes/complexSearch?query=${foodName}&apiKey=${apiKey}`;
+    const searchResponse = await fetch(searchUrl);
+    const searchData = await searchResponse.json();
+    // console.log('database.js -> food search data: ', searchData.results[0]);
+    const foodId = searchData.results[0].id;
+    const nutritionUrl = `https://api.spoonacular.com/recipes/${foodId}/nutritionWidget.json?apiKey=${apiKey}`;
+    const nutritionResponse = await fetch(nutritionUrl);
+    const nutritionData = await nutritionResponse.json();
+    // console.log('database.js -> calories data', nutritionData.calories);
 
-    // const docRef = await addDoc(
-    //   collection(db, `users/${userId}/foodIntake`),
-    //   newFoodIntake,
-    //   foodName
-    // );
-    await setDoc(docRef, newFoodIntake);
-    //console.log('Document written with ID: ', docRef.id);
-    return docRef.id;
+    return {
+      name: foodName,
+      image: searchData.results[0].image,
+      imageType: searchData.results[0].imageType,
+      calories: nutritionData.calories
+    }
   } catch (error) {
-    console.error('Error adding document: ', error);
+    console.error('Cannot get food from third-party-API', error);
     throw error;
   }
-};
+}
 
-// READ - Get all food intake documents for a user from Firestore
+// SELECT/READ -> get all food intake documents for a user from Firestore
 export const getAllFoodIntake = async (userId) => {
   const foodIntakeRef = collection(db, 'users', userId, 'foodIntake');
   try {
     const querySnapshot = await getDocs(foodIntakeRef);
-    const foodIntakeList = [];
+    const foodIntakeList = []
+  
     querySnapshot.forEach((doc) => {
       foodIntakeList.push({ id: doc.id, ...doc.data() });
     });
     return foodIntakeList;
   } catch (error) {
-    console.error('Error getting documents: ', error);
+    console.error('database.js -> cannot select/read: ', error);
     throw error;
   }
 };
 
-// UPDATE - Update a food intake document in Firestore
-export const updateFoodIntake = async (userId, foodIntakeId, updates) => {
-  const foodIntakeRef = doc(db, 'users', userId, 'foodIntake', foodIntakeId);
-  const updatedFoodIntake = {
-    ...updates,
-    updatedAt: serverTimestamp(), // update timestamp
+// CREATE/ADD -> create a food and add to firestore
+export const addFoodIntake = async (userId, foodName, calories) => {
+  const foodIntakeRef = collection(db, 'users', userId, foodName);
+  const newFood = {
+    foodName: foodName,
+    servingSize: 1,
+    calorieData: calories,
+    totalCalories: calories, // calculate total calories
+  };
+  // console.log("database.js -> new food: ", newFood)
+  const docRef = doc(db, `users/${userId}/foodIntake/${foodName}`);
+  try {
+    await setDoc(docRef, newFood);
+    return "success"
+  } catch (error) {
+    console.error('database.js -> cannot create food', error);
+    throw error;
+  }
+};
+
+// DELETE - delete a food from firestore
+export const deleteFood = async (userId, foodName) => {
+  const foodRef = doc(db, 'users', userId, 'foodIntake', foodName);
+  try {
+    await deleteDoc(foodRef);
+    console.log('delete successfully');
+    return "success"
+  } catch (error) {
+    console.error('database.js -> cannot delete from firestore: ', error);
+    throw error;
+  }
+};
+
+// UPDATE - update a food intake document in Firestore
+export const updateFood = async (userId, foodName, updates) => {
+  const foodRef = doc(db, 'users', userId, 'foodIntake', foodName);
+  const apiKey = '8a3db390b40b467e88258d6974076992';
+  const searchUrl = `https://api.spoonacular.com/recipes/complexSearch?query=${foodName}&apiKey=${apiKey}`;
+  const searchResponse = await fetch(searchUrl);
+  const searchData = await searchResponse.json();
+  const foodId = searchData.results[0].id;
+  const nutritionUrl = `https://api.spoonacular.com/recipes/${foodId}/nutritionWidget.json?apiKey=${apiKey}`;
+  const nutritionResponse = await fetch(nutritionUrl);
+  const nutrition = await nutritionResponse.json();
+  const coloaris = nutrition.calories
+
+  const updatedFood = {
+    foodName: foodName,
+    calorieData: coloaris,
+    servingSize: updates,
+    totalCalories: coloaris * updates
   };
   try {
-    await updateDoc(foodIntakeRef, updatedFoodIntake);
+    await setDoc(foodRef, updatedFood);
     console.log('Document updated successfully');
   } catch (error) {
     console.error('Error updating document: ', error);
@@ -98,18 +136,7 @@ export const updateFoodIntake = async (userId, foodIntakeId, updates) => {
   }
 };
 
-// DELETE - Delete a food intake document from Firestore
-export const deleteFoodIntake = async (userId, foodName) => {
-  const foodIntakeRef = doc(db, 'users', userId, 'foodIntake', foodName);
-  try {
-    await deleteDoc(foodIntakeRef);
-    console.log('Document deleted successfully');
-  } catch (error) {
-    console.error('Error deleting document: ', error);
-    throw error;
-  }
-};
-
+// reivews
 export const addReview = async (reviews) => {
   try {
     await addDoc(collection(db, 'reviews'), {

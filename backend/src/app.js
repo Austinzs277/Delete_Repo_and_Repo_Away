@@ -9,20 +9,54 @@ import * as db from './database.js';
 const app = express();
 app.use(bodyParser.json());
 
-app.post('/addFood', async (req, res) => {
-  const { name, caloriesPerServing, servings } = req.body;
-  console.log(name, caloriesPerServing, servings);
-  const newFood = db.addFoodIntake('Bao', name, servings, caloriesPerServing);
+// search food and get information from API
+app.post('/searchFood', async (req, res) => {
+  const foodName = req.body.foodName
+  const foodInfo = await db.searchFood(foodName)
+  console.log("app.js -> search food info: ", foodInfo);
+  res.status(200).send(foodInfo);
+});
 
-  res.status(200).send(newFood);
+app.post('/selectAllFood', async (req, res) => {
+  const username = req.body.username
+  const allFood = await db.getAllFoodIntake(username)
+  console.log("app.js -> show the user all the food: ", allFood)
+  res.status(200).send(allFood);
+});
+
+app.post('/addFood', async (req, res) => {
+  const username = req.body.username
+  const foodName = req.body.foodName
+  const calories = req.body.calories
+  const state = db.addFoodIntake(username, foodName, calories);
+  if (state) {
+    res.status(200).send("app.js -> successfully create food to firestore")
+  } else {
+    res.status(400).send("cannot add food to firestore")
+  }
 });
 
 app.post('/deleteFood', async (req, res) => {
-  const { name, caloriesPerServing, servings } = req.body;
-  console.log(name, caloriesPerServing, servings);
-  const newFood = db.deleteFoodIntake('Bao', name);
-  
-  res.status(200).send(newFood);
+  const username = req.body.username
+  const foodName = req.body.foodName
+  const state = db.deleteFood(username, foodName);
+  if (state) {
+    res.status(200).send("app.js -> successfully delete")
+  } else {
+    res.status(400).send("fail to delete food from firestore")
+  }
+});
+
+app.post('/updateFood', async (req, res) => {
+  const username = req.body.username
+  const foodName = req.body.foodName
+  const update = req.body.update
+  const state = db.updateFood(username, foodName, update);
+  if (state) {
+    res.status(200).send("app.js -> successfully update the food")
+  } else {
+    res.status(400).send('app.js -> fail to update food')
+  }
 });
 
 // reviews

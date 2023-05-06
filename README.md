@@ -35,32 +35,24 @@ table 2:
 1. login/logout: firebase auth
 
 2. POST api/searchFood: call the third party api to get cal for food
+    - input: req.body.foodName
+    - output: a json object: {name, image, imageType, calories}
 
-    input: req.foodName
+3. POST api/selectAllFood: get all food for the user
+    - input: req.body.username
+    - output: allFood(json)
 
-    output: res.foodName, res.calories, res.url
+4. POST api/addFood: Add food **(only 1, can't take other number)**
+    - input: req.body.username (username), req.body.foodName, req.body.calories, req.body.number
+    - output: 200/error
 
-2. POST api/addFood: Add food
+5. POST api/deleteFood: delete food fron firestore
+    - input: req.body.username, req.body.foodName
+    - output: 200/400
 
-    input: req.foodId
-
-    output: 201/400
-
-3. GET api/selectAllFood: get all food for the user
-
-    output: res.all
-
-4. PUT api/deleteFood
-
-    input: req.foodId
-
-    output: 201/400
-
-5. PUT api/updateFood
-
-    input: req.newNumber
-
-    output: req.number, req.cal, req.totalCal
+5. PUT api/updateFood: update the number of the food, **only add 1**
+    - input: req.body.username, req.body.foodName
+    - output: 201/400
 
 6. GET api/reviews
 
