@@ -63,7 +63,7 @@ function HomePage() {
     /** TODO: Clean there variables */
     const [foodName, setFoodName] = useState('');
     const [foodData, setFoodData] = useState(null);
-    const [savedFoods, setSavedFoods] = useState([]);
+    const [savedFoods, setSavedFoods] = useState(null);
 
     // Handle the search button
     const handleSearch = async (event) => {
@@ -103,6 +103,37 @@ function HomePage() {
             console.log(error)
         });
     };
+
+    // handle the save food button
+    const handleSaveFood = () => {
+        const saveFood = {
+            "foodName": foodData.name,
+            "username": user_email,
+            "calories": foodData.caloriesPerServing
+        }
+        fetch("/addFood", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(saveFood),
+            })
+            .then(response =>{
+                if (response.ok) {
+                console.log(response);
+                return response.json();
+                } else{
+                /** TODO: Implement the 404 and catch the error  */
+                throw new Error("Reponse is not OK");
+                }
+        })
+        .then(data => {
+           console.log(data);
+        })
+        .catch(error => {
+            console.log(error)
+        });
+    }
 
   // TODO: Delete after debugging
   /*
@@ -158,7 +189,7 @@ function HomePage() {
                             </Typography>
                         </Grid>
                         <Grid item>
-                            <Button variant="outlined" color="primary">
+                            <Button variant="outlined" color="primary" onClick={() => handleSaveFood()}>
                             Save Food
                             </Button>
                         </Grid>

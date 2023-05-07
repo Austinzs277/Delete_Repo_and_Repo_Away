@@ -39,7 +39,29 @@ const uiConfig = {
       const userEmail = authResult.user.email; // get user's login email
       const expirationDate = new Date(Date.now() + 86400000); // 24 hours from now
       document.cookie = `user_email=${userEmail}; expires=${expirationDate.toUTCString()}`;
-
+      fetch("/checkUser", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        /** TODO: Replace here with user's email  */
+        body: JSON.stringify({"username": userEmail}),
+        })
+        .then(response =>{
+            if (response.ok) {
+                console.log(response);
+                return response.json();
+            } else{
+            /** TODO: Implement the 404 and catch the error  */
+            throw new Error("Reponse is not OK");
+            }
+        })
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => {
+            console.log(error)
+        });
       // prevent redirection
       return false
     },
