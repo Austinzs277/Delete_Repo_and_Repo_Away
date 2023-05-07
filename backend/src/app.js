@@ -59,9 +59,9 @@ app.post('/updateFood', async (req, res) => {
   const username = req.body.username
   const foodName = req.body.foodName
   const update = req.body.update
-  const state = db.updateFood(username, foodName, update);
-  if (state) {
-    res.status(200).send("app.js -> successfully update the food")
+  const allFood = await db.updateFood(username, foodName, update);
+  if (allFood) {
+    res.status(200).send(allFood)
   } else {
     res.status(400).send('app.js -> fail to update food')
   }
