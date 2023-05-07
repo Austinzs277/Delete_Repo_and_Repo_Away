@@ -13,15 +13,23 @@ app.use(bodyParser.json());
 app.post('/searchFood', async (req, res) => {
   const foodName = req.body.foodName
   const foodInfo = await db.searchFood(foodName)
-  console.log("app.js -> search food info: ", foodInfo);
-  res.status(200).send(foodInfo);
+  // console.log("app.js -> search food info: ", foodInfo);
+  if (foodInfo) {
+    res.status(200).send(foodInfo);
+  } else {
+    res.status(404).send("can't find the food")
+  }
 });
 
 app.post('/selectAllFood', async (req, res) => {
   const username = req.body.username
   const allFood = await db.getAllFoodIntake(username)
-  console.log("app.js -> show the user all the food: ", allFood)
-  res.status(200).send(allFood);
+  // console.log("app.js -> show the user all the food: ", allFood)
+  if (allFood) {
+    res.status(200).send(allFood);
+  } else {
+    res.status(400).send("there is nothing here")
+  }
 });
 
 app.post('/addFood', async (req, res) => {
@@ -56,6 +64,18 @@ app.post('/updateFood', async (req, res) => {
     res.status(200).send("app.js -> successfully update the food")
   } else {
     res.status(400).send('app.js -> fail to update food')
+  }
+});
+
+// check user
+app.post('/checkUser', async (req, res) => {
+  const username = req.body.username
+  const state = await db.checkUser(username)
+  // console.log("app.js -> state", state)
+  if (state) {
+    res.status(200).send("app.js -> user exist or created")
+  } else {
+    res.status(400).send("app.js -> something wrong with the user")
   }
 });
 

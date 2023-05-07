@@ -56,7 +56,11 @@ table 2:
 
 6. GET api/reviews
 
-7. POST api/reviews 
+7. POST api/reviews
+
+8. POST api/checkUser: create user when login
+    - input: req.body.username
+    - 201/400
 
 
 ### Third Party API

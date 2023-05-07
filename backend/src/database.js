@@ -9,7 +9,8 @@ import {
   addDoc,
   deleteDoc,
   getFirestore,
-  getDocs
+  getDocs,
+  getDoc
 } from 'firebase/firestore';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -40,17 +41,19 @@ export const searchFood = async (foodName) => {
     const searchResponse = await fetch(searchUrl);
     const searchData = await searchResponse.json();
     // console.log('database.js -> food search data: ', searchData.results[0]);
-    const foodId = searchData.results[0].id;
-    const nutritionUrl = `https://api.spoonacular.com/recipes/${foodId}/nutritionWidget.json?apiKey=${apiKey}`;
-    const nutritionResponse = await fetch(nutritionUrl);
-    const nutritionData = await nutritionResponse.json();
-    // console.log('database.js -> calories data', nutritionData.calories);
-
-    return {
-      name: searchData.results[0].title,
-      image: searchData.results[0].image,
-      imageType: searchData.results[0].imageType,
-      calories: nutritionData.calories
+    if (searchData.results[0]) {
+      const foodId = searchData.results[0].id;
+      const nutritionUrl = `https://api.spoonacular.com/recipes/${foodId}/nutritionWidget.json?apiKey=${apiKey}`;
+      const nutritionResponse = await fetch(nutritionUrl);
+      const nutritionData = await nutritionResponse.json();
+      // console.log('database.js -> calories data', nutritionData.calories);
+      console.log('database.js -> successfully retrive food from thirdpart API');
+      return {
+        name: searchData.results[0].title,
+        image: searchData.results[0].image,
+        imageType: searchData.results[0].imageType,
+        calories: nutritionData.calories
+      }
     }
   } catch (error) {
     console.error('Cannot get food from third-party-API', error);
@@ -64,11 +67,13 @@ export const getAllFoodIntake = async (userId) => {
   try {
     const querySnapshot = await getDocs(foodIntakeRef);
     const foodIntakeList = []
-  
     querySnapshot.forEach((doc) => {
       foodIntakeList.push({ id: doc.id, ...doc.data() });
     });
-    return foodIntakeList;
+    if (foodIntakeList.length > 0) {
+      console.log('database.js -> successfully get all the food for the user')
+      return foodIntakeList;
+    }
   } catch (error) {
     console.error('database.js -> cannot select/read: ', error);
     throw error;
@@ -87,7 +92,8 @@ export const addFoodIntake = async (userId, foodName, calories) => {
   // console.log("database.js -> new food: ", newFood)
   const docRef = doc(db, `users/${userId}/foodIntake/${foodName}`);
   try {
-    await setDoc(docRef, newFood);
+    await setDoc(docRef, newFood); 
+    console.log("database.js -> successfully add food")
     return "success"
   } catch (error) {
     console.error('database.js -> cannot create food', error);
@@ -100,7 +106,7 @@ export const deleteFood = async (userId, foodName) => {
   const foodRef = doc(db, 'users', userId, 'foodIntake', foodName);
   try {
     await deleteDoc(foodRef);
-    console.log('delete successfully');
+    console.log('atabase.js -> food delete successfully');
     return "success"
   } catch (error) {
     console.error('database.js -> cannot delete from firestore: ', error);
@@ -129,14 +135,34 @@ export const updateFood = async (userId, foodName, updates) => {
   };
   try {
     await setDoc(foodRef, updatedFood);
-    console.log('Document updated successfully');
+    const allFood = await getAllFoodIntake(userId);
+    console.log('database.js -> food update successfully');
+    return allFood;
   } catch (error) {
     console.error('Error updating document: ', error);
     throw error;
   }
 };
 
-// reivews
+// CREATE user 
+export const checkUser = async (userId) => {
+  try {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      console.log("database.js -> user exist")
+    } else {
+      await setDoc(doc(db, "users", userId), {});
+      console.log("database.js -> successfully create user" )
+    }
+    return "success"
+  } catch (error) {
+    console.error('Error chekcing users: ', error);
+    throw error;
+  }
+};
+
+// CREATE reivews
 export const addReview = async (reviews) => {
   try {
     await addDoc(collection(db, 'reviews'), {
@@ -149,6 +175,7 @@ export const addReview = async (reviews) => {
   }
 };
 
+// SELECT/READ reviews
 export const getReview = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, 'reviews'));
