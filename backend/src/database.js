@@ -107,7 +107,8 @@ export const deleteFood = async (userId, foodName) => {
   try {
     await deleteDoc(foodRef);
     console.log('atabase.js -> food delete successfully');
-    return "success"
+    const allFood = await getAllFoodIntake(userId);
+    return allFood
   } catch (error) {
     console.error('database.js -> cannot delete from firestore: ', error);
     throw error;
