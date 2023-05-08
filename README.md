@@ -64,6 +64,4 @@ table 2:
 
 
 ### Third Party API
-https://trackapi.nutritionix.com/v2/search/instant?query={{food name}}
-
-
+https://api.spoonacular.com/recipes/
