@@ -12,7 +12,6 @@ function ProfilePage() {
 
     // access the cookie to check login info
     const user_email = getCookie('user_email');
-    console.log(user_email);
 
     useEffect(() => {
         if (user_email) {
@@ -21,8 +20,8 @@ function ProfilePage() {
       }, []);
 
     return(
-        <div>
-            <NavBar user={user}></NavBar>
+        <div style={{ textAlign: 'center' }}>
+            <NavBar user={user} user_email={user_email}></NavBar>
             <h1>{user_email}'s FoodTable</h1>
             <FoodTable user={user_email}></FoodTable>
         </div>

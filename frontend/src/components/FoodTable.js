@@ -118,8 +118,6 @@ const FoodTable = (props) => {
         .catch(error => {
             console.log(error)
         });
-
-        setOpen(false);
     };
 
     const handleCancel = () => {

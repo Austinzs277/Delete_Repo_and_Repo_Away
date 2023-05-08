@@ -6,8 +6,9 @@ import {
   Button,
   IconButton,
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom';
+import { lightBlue, blue } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,14 +19,38 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    cursor: 'pointer',
+    '&:hover': {
+      color: 'grey',
+    },
   },
 }));
 
 const NavBar = (props) => {
-  const { user } = props;
+  const { user, user_email } = props;
 
   const classes = useStyles();
   const navigate = useNavigate();
+
+  const ColorButton = withStyles((theme) => ({
+    root: {
+      color: theme.palette.getContrastText(blue[500]),
+      backgroundColor: blue[500],
+      '&:hover': {
+        backgroundColor: blue[700],
+      },
+    },
+  }))(Button);
+
+  const ReviewButton = withStyles((theme) => ({
+    root: {
+      color: theme.palette.getContrastText(lightBlue[500]),
+      backgroundColor: lightBlue[500],
+      '&:hover': {
+        backgroundColor: lightBlue[700],
+      },
+    },
+  }))(Button);
 
   const handleLoginClick = () => {
     navigate('/login');
@@ -38,6 +63,10 @@ const NavBar = (props) => {
     navigate('/review');
   };
 
+  const handleTitleClick = () => {
+    navigate('/');
+  };
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -47,17 +76,20 @@ const NavBar = (props) => {
           color="inherit"
           aria-label="menu"
         ></IconButton>
-        <Typography variant="h6" className={classes.title}>
+        <Typography variant="h6" className={classes.title} onClick={handleTitleClick}>
           CalCalories
         </Typography>
         {user ? (
-          <div>
-            <Button color="inherit" onClick={handleProfileClick}>
+          <div style={{ display: 'flex', alignItems: 'center', }}>
+            <Typography variant="h6" style={{ marginRight: '0.5rem' }}>
+              Welcome, {user_email}
+            </Typography>
+            <ColorButton  onClick={handleProfileClick} style={{ marginRight: '0.5rem' }}>
               Profile
-            </Button>
-            <Button color="inherit" onClick={handleReviewClick}>
+            </ColorButton>
+            <ReviewButton color="inherit" onClick={handleReviewClick} style={{ marginRight: '0.5rem' }}>
               Review
-            </Button>
+            </ReviewButton>
             <Button color="inherit" onClick={handleLoginClick}>
               Logout
             </Button>

@@ -8,6 +8,11 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import { getCookie } from '../components/GetCookie';
 import 'firebase/compat/auth';
 
@@ -63,7 +68,12 @@ function HomePage() {
     /** TODO: Clean there variables */
     const [foodName, setFoodName] = useState('');
     const [foodData, setFoodData] = useState(null);
-    const [savedFoods, setSavedFoods] = useState(null);
+
+    // Control the dialog
+    const [open, setOpen] = useState(false);
+    const handleClose = () => {
+        setOpen(false);
+      };
 
     // Handle the search button
     const handleSearch = async (event) => {
@@ -85,7 +95,8 @@ function HomePage() {
                 return response.json();
                 } else{
                 /** TODO: Implement the 404 and catch the error  */
-                throw new Error("Reponse is not OK");
+                    setOpen(true);
+                    throw new Error("Reponse is not OK");
                 }
         })
         .then(data => {
@@ -148,7 +159,7 @@ function HomePage() {
 
   return (
     <div>
-      <NavBar user={user}></NavBar>
+      <NavBar user={user} user_email={user_email}></NavBar>
       <form
         className={classes.root}
         noValidate
@@ -189,15 +200,40 @@ function HomePage() {
                             </Typography>
                         </Grid>
                         <Grid item>
-                            <Button variant="outlined" color="primary" onClick={() => handleSaveFood()}>
-                            Save Food
-                            </Button>
+                            {user ?
+                                <Button variant="outlined" color="primary" onClick={() => handleSaveFood()}>
+                                Save Food
+                                </Button>
+                                :
+                                <Typography variant="caption" display="block" gutterBottom>
+                                    Login to save this dish's calories into your profile.
+                                </Typography>
+                            }
                         </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
             </Paper>
         )}
+
+        <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle id="alert-dialog-title">{"Oops!"}</DialogTitle>
+            <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+                It seems that we can't find the food related to your input. Could you please other inputs?
+            </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+            <Button onClick={handleClose} color="primary" autoFocus>
+                Got it! I'll try different food!
+            </Button>
+            </DialogActions>
+        </Dialog>
     </div>
   );
 }

@@ -6,6 +6,8 @@ import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -68,6 +70,14 @@ const uiConfig = {
   },
 };
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+    },
+  },
+}));
+
 function LoginPage() {
 
   // State to keep track of signed-in state
@@ -99,24 +109,26 @@ function LoginPage() {
     return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
   }, []);
 
+  const classes = useStyles();
+
   if(!isSignedIn) {
     return (
-      <div>
+      <div className={classes.root} style={{ textAlign: 'center' }}>
         <p>Please sign-in:</p>
         <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
       </div>
     );
   }
   return (
-    <div>
-      <h1>My App</h1>
-      <p>Welcome - You are now signed-in - {isSignedIn}!</p>
-      <button onClick={handleClick}>
-        LogOut
-      </button>
-      <button onClick={handleHomePage}>
+    <div className={classes.root} style={{ textAlign: 'center' }}>
+      <h1>CalCalories User's Dashboard</h1>
+      <p>Welcome, You are now signed-in!</p>
+      <Button variant="outlined" color="secondary" onClick={handleClick}>
+        I really want to LogOut
+      </Button>
+      <Button variant="outlined" color="primary" onClick={handleHomePage}>
         Go to HomePage
-      </button>
+      </Button>
     </div>
   );
 }

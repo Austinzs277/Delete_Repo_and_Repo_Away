@@ -59,22 +59,24 @@ function ReviewPage() {
   }, []);
 
   return (
-    <div>
-      <NavBar user={user}></NavBar>
-      <h1>Reviews</h1>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          id="review"
-          label="Leave a review!"
-          variant="outlined"
-          value={reviewText}
-          onChange={(event) => setReviewText(event.target.value)}
-        />
-        <Button variant="contained" color="primary" type="submit">
-          Submit
-        </Button>
-      </form>
-      <h1>Past Reviews</h1>
+    <div >
+      <NavBar user={user} user_email={user_email}></NavBar>
+      <div style={{ textAlign: 'center' }}>
+        <h1>Reviews</h1>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            id="review"
+            label="Leave a review!"
+            variant="outlined"
+            value={reviewText}
+            onChange={(event) => setReviewText(event.target.value)}
+          />
+          <Button variant="contained" color="primary" type="submit">
+            Submit
+          </Button>
+        </form>
+        <h1>Past Reviews</h1>
+      </div>
       {reviews.length ? (
         <>
           <ul>
