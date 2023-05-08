@@ -48,11 +48,7 @@ app.post('/deleteFood', async (req, res) => {
   const username = req.body.username
   const foodName = req.body.foodName
   const allFood = await db.deleteFood(username, foodName);
-  if (allFood) {
-    res.status(200).send(allFood)
-  } else {
-    res.status(400).send("fail to delete food from firestore")
-  }
+  res.status(200).send(allFood
 });
 
 app.post('/updateFood', async (req, res) => {
