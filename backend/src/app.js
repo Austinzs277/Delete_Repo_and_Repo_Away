@@ -48,7 +48,7 @@ app.post('/deleteFood', async (req, res) => {
   const username = req.body.username
   const foodName = req.body.foodName
   const allFood = await db.deleteFood(username, foodName);
-  res.status(200).send(allFood
+  res.status(200).send(allFood)
 });
 
 app.post('/updateFood', async (req, res) => {
