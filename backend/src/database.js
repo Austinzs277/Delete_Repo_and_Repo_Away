@@ -70,7 +70,9 @@ export const getAllFoodIntake = async (userId) => {
     querySnapshot.forEach((doc) => {
       foodIntakeList.push({ id: doc.id, ...doc.data() });
     });
-    if (foodIntakeList.length > 0) {
+    if (foodIntakeList == null){
+      return []
+    } else {
       console.log('database.js -> successfully get all the food for the user')
       return foodIntakeList;
     }
@@ -108,6 +110,9 @@ export const deleteFood = async (userId, foodName) => {
     await deleteDoc(foodRef);
     console.log('atabase.js -> food delete successfully');
     const allFood = await getAllFoodIntake(userId);
+    if (allFood == null){
+      return []
+    }
     return allFood
   } catch (error) {
     console.error('database.js -> cannot delete from firestore: ', error);
